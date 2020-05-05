@@ -9,14 +9,14 @@ using WooCommerceNET.WooCommerce.v3.Extension;
 
 namespace WcSync.Wc
 {
-    public class ProductService : IProductService
+    public class WcProductService : IWcProductService
     {
         private readonly IConfiguration _configuration;
         private WCObject _wcObject;
 
         private WCObject WcClient => _wcObject ?? (_wcObject = Connect());
 
-        public ProductService(IConfiguration configuration)
+        public WcProductService(IConfiguration configuration)
         {
             _configuration = configuration;
         }

@@ -3,8 +3,8 @@ using WcSync.Db.Models;
 
 namespace WcSync.Db
 {
-    public interface IProductRepository
+    public interface IDbProductRepository
     {
-        IList<Product> GetAvailableProducts();
+        List<Product> GetAvailableProducts();
     }
 }

@@ -4,9 +4,9 @@ using WcSync.Db.Models;
 
 namespace WcSync.Db
 {
-    public class ProductRepository : IProductRepository
+    public class DbProductRepository : IDbProductRepository
     {
-        public IList<Product> GetAvailableProducts()
+        public List<Product> GetAvailableProducts()
         {
             throw new NotImplementedException();
         }

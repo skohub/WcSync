@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 
 namespace WcSync.Wc 
 {
-    public interface IProductService
+    public interface IWcProductService
     {
         Task<int> GetProductIdBySku(string sku);
 
