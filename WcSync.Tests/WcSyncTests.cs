@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using WcSync.Cli;
@@ -50,7 +51,8 @@ namespace WcSync.Tests
             // Arrange
             var productService = new ProductService(
                 _wcProductServiceMock.Object,
-                _dbProductRepositoryMock.Object);
+                _dbProductRepositoryMock.Object,
+                new Mock<ILogger<ProductService>>().Object);
 
             // Act
             productService.UpdateRecentProducts();

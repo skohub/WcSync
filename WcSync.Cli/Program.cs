@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using WcSync.Db;
 using WcSync.Wc;
 
@@ -25,6 +26,8 @@ namespace WcSync.Cli
                 .AddSingleton<IDbProductRepository, DbProductRepository>()
                 .AddSingleton<IProductService, ProductService>()
                 .AddSingleton<IConfiguration>(configuration);
+
+            serviceCollection.AddLogging(configure => configure.AddConsole());
 
             return serviceCollection;
         }
