@@ -6,6 +6,8 @@ namespace WcSync.Db.Models
     {
         public int Id { get; set; }
 
+        public string Name { get; set; }
+
         public IList<Store> Availability { get; set; }
     }
 }

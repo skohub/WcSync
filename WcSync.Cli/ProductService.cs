@@ -56,7 +56,7 @@ namespace WcSync.Cli
             } 
             catch (Exception e) 
             {
-                _logger.LogError(e, $"Product {product.Id} was not found in woocommerce");
+                _logger.LogError(e, $"Product {product.Name} - {product.Id} was not found in woocommerce");
             }
 
             try
@@ -65,7 +65,7 @@ namespace WcSync.Cli
                     var newStockStatus = GetStockStatus(product);
                     await _wcProductService.SetStockStatus(id.Value, newStockStatus);
 
-                    _logger.LogInformation($"Product {id.Value} is successfully updated to \"{newStockStatus}\"");
+                    _logger.LogInformation($"Product {product.Name} - {product.Id} is successfully updated to \"{newStockStatus}\"");
                 }
                 else
                 {

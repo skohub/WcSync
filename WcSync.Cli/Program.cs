@@ -27,7 +27,7 @@ namespace WcSync.Cli
                 .AddSingleton<IProductService, ProductService>()
                 .AddSingleton<IConfiguration>(configuration);
 
-            serviceCollection.AddLogging(configure => configure.AddConsole());
+            serviceCollection.AddLogging(configure => configure.AddConsole(c => c.TimestampFormat = "[dd/MM/yy HH:mm:ss] "));
 
             return serviceCollection;
         }

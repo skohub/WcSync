@@ -33,6 +33,7 @@ namespace WcSync.Db
                     (id, products) => new Product
                     {
                         Id = id,
+                        Name = products.First(p => p.ProductId == id).ProductName,
                         Availability = products
                             .Select(p => new Store
                             {
