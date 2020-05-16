@@ -20,10 +20,6 @@ namespace WcSync.Tests
         public void SetUp()
         {
             _wcProductServiceMock = new Mock<IWcProductService>();
-            _wcProductServiceMock
-                .Setup(s => s.GetProductIdBySku(It.IsAny<string>()))
-                .ReturnsAsync(0);
-
             _dbProductRepositoryMock = new Mock<IDbProductRepository>();
             _dbProductRepositoryMock
                 .Setup(r => r.GetAvailableProducts())
@@ -41,8 +37,6 @@ namespace WcSync.Tests
                         }
                     }
                 });
-
-
         }
 
         [Test]

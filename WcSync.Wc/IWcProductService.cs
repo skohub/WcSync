@@ -1,11 +1,10 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace WcSync.Wc 
 {
     public interface IWcProductService
     {
-        Task<int> GetProductIdBySku(string sku);
-
-        Task SetStockStatus(int id, string stockStatus);
+        Task UpdateStockStatus(string sku, string stockStatus, IList<string> availability);
     }
 }

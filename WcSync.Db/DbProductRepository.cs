@@ -39,6 +39,7 @@ namespace WcSync.Db
                             {
                                 Name = p.StoreName,
                                 Number = p.Number,
+                                Type = p.StoreType,
                             })
                             .ToList(),
                     })

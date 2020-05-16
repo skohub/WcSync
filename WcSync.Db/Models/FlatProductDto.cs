@@ -8,6 +8,8 @@ namespace WcSync.Db.Models
 
         public string StoreName { get; set; }
 
+        public StoreType StoreType { get; set; }
+
         public int Number { get; set; }    
     }
 }
