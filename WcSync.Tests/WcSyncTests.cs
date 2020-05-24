@@ -32,7 +32,7 @@ namespace WcSync.Tests
                             new Store
                             {
                                 Name = "test",
-                                Number = 1,
+                                Quantity = 1,
                             }
                         }
                     }
