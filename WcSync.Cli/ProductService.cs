@@ -6,11 +6,15 @@ using WcSync.Db.Models;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Net;
 
 namespace WcSync.Cli
 {
     public class ProductService : IProductService
     {
+        private const int RequestDelay = 3000;
+        private const int FailedRequestDelay = 60000;
+
         private readonly IWcProductService _wcProductService;
         private readonly IDbProductRepository _dbProductRepository;
         private readonly ILogger<ProductService> _logger;
@@ -35,8 +39,7 @@ namespace WcSync.Cli
 
                 _logger.LogInformation($"Found {products.Count} product(s) to update");
 
-                var tasks = products.Select(UpdateProduct).ToArray();
-                Task.WaitAll(tasks);
+                products.ForEach(product => Task.Delay(RequestDelay).ContinueWith(t => UpdateProduct(product)).Wait());
             }
             catch (Exception e)
             {
@@ -56,17 +59,24 @@ namespace WcSync.Cli
                 var availability = GetProductAvailability(product);
                 await _wcProductService.UpdateStockStatus(product.Id.ToString(), stockStatus, availability);
 
-                _logger.LogInformation($"Product {product.Name} - {product.Id} was successfully updated to \"{stockStatus}\"");
+                _logger.LogInformation(
+                    $"Product {product.Name} - {product.Id} was successfully updated to \"{stockStatus}\", " +
+                    $"available in \"{string.Join(", ", availability)}\"");
             } 
+            catch (WebException e)
+            {
+                _logger.LogError(e, $"Failed to {nameof(_wcProductService.UpdateStockStatus)} for {product.Name} - {product.Id}");
+                await Task.Delay(FailedRequestDelay);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, $"Failed to {nameof(_wcProductService.UpdateStockStatus)} for {product.Name} - {product.Id}");
-            }            
+            }
         }
 
         private string GetStockStatus(Product product) 
         {
-            return product.Availability.Sum(a => a.Quantity) > 0 ? "instock" : "onbackorder";
+            return product.Availability.Sum(a => a.Quantity) > 0 ? "instock" : "outofstock";
         }
 
         private IList<string> GetProductAvailability(Product product)
