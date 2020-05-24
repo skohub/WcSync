@@ -10,6 +10,6 @@ namespace WcSync.Db.Models
 
         public StoreType StoreType { get; set; }
 
-        public int Number { get; set; }    
+        public int Quantity { get; set; }    
     }
 }

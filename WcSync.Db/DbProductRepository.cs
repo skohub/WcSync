@@ -38,7 +38,7 @@ namespace WcSync.Db
                             .Select(p => new Store
                             {
                                 Name = p.StoreName,
-                                Quantity = p.Number,
+                                Quantity = p.Quantity,
                                 Type = p.StoreType,
                             })
                             .ToList(),
