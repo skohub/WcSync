@@ -71,7 +71,10 @@ namespace WcSync.Cli
 
         private IList<string> GetProductAvailability(Product product)
         {
-            return product.Availability.Where(a => a.Type == StoreType.Shop).Select(a => a.Name).ToList();
+            return product.Availability
+                .Where(a => a.Type == StoreType.Shop)
+                .Where(a => a.Quantity > 0)
+                .Select(a => a.Name).ToList();
         }
     }
 }
