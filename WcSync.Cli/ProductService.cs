@@ -76,7 +76,11 @@ namespace WcSync.Cli
 
         private string GetStockStatus(Product product) 
         {
-            return product.Availability.Sum(a => a.Quantity) > 0 ? "instock" : "outofstock";
+            var available = product.Availability
+                .Where(a => a.Type == StoreType.Shop || a.Type == StoreType.Warehouse)
+                .Any(a => a.Quantity > 0);
+
+            return available ? "instock" : "onbackorder";
         }
 
         private IList<string> GetProductAvailability(Product product)
