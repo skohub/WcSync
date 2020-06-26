@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 
 namespace WcSync.Cli
 {
@@ -39,7 +40,10 @@ namespace WcSync.Cli
 
                 _logger.LogInformation($"Found {products.Count} product(s) to update");
 
-                products.ForEach(product => Task.Delay(RequestDelay).ContinueWith(t => UpdateProduct(product)).Wait());
+                products.ForEach(product => {
+                    Thread.Sleep(RequestDelay);
+                    UpdateProduct(product).Wait();
+                });
             }
             catch (Exception e)
             {
