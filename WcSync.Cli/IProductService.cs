@@ -1,7 +1,9 @@
+using System.Threading.Tasks;
+
 namespace WcSync.Cli
 {
     public interface IProductService
     {
-        void UpdateRecentProducts();
+        Task UpdateRecentProductsAsync();
     }
 }

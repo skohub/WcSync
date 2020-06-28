@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WcSync.Db;
@@ -8,12 +9,12 @@ namespace WcSync.Cli
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var serviceProvider = ConfigureServices(new ServiceCollection()).BuildServiceProvider();
 
             var productService = serviceProvider.GetService<IProductService>();
-            productService.UpdateRecentProducts();
+            await productService.UpdateRecentProductsAsync();
         }
 
         private static IServiceCollection ConfigureServices(IServiceCollection serviceCollection) {

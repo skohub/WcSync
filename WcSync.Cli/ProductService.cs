@@ -30,9 +30,9 @@ namespace WcSync.Cli
             _logger = logger;
         }
 
-        public void UpdateRecentProducts()
+        public async Task UpdateRecentProductsAsync()
         {
-            _logger.LogDebug($"Begin {nameof(UpdateRecentProducts)}");
+            _logger.LogDebug($"Begin {nameof(UpdateRecentProductsAsync)}");
 
             try
             {
@@ -40,17 +40,18 @@ namespace WcSync.Cli
 
                 _logger.LogInformation($"Found {products.Count} product(s) to update");
 
-                products.ForEach(product => {
-                    Thread.Sleep(RequestDelay);
-                    UpdateProduct(product).Wait();
-                });
+                foreach (var product in products)
+                {
+                    await Task.Delay(RequestDelay);
+                    await UpdateProduct(product);
+                }
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Something went wrong");
             }
 
-            _logger.LogDebug($"End {nameof(UpdateRecentProducts)}");
+            _logger.LogDebug($"End {nameof(UpdateRecentProductsAsync)}");
         }
 
         private async Task UpdateProduct(Product product)

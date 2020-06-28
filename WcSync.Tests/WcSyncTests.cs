@@ -7,6 +7,7 @@ using WcSync.Wc;
 using WcSync.Db;
 using WcSync.Db.Models;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace WcSync.Tests
 {
@@ -40,7 +41,7 @@ namespace WcSync.Tests
         }
 
         [Test]
-        public void HappyFlow() 
+        public async Task HappyFlow()
         {
             // Arrange
             var productService = new ProductService(
@@ -49,7 +50,7 @@ namespace WcSync.Tests
                 new Mock<ILogger<ProductService>>().Object);
 
             // Act
-            productService.UpdateRecentProducts();
+            await productService.UpdateRecentProductsAsync();
 
             // Assert
         }
