@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
-using WcSync.Db.Models;
+using WcSync.Model;
+using WcSync.Model.Entities;
 using Microsoft.Extensions.Configuration;
 using Dapper;
 using MySql.Data.MySqlClient;

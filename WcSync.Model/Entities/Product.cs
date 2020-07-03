@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace WcSync.Db.Models
+namespace WcSync.Model.Entities
 {
     public class Product 
     {

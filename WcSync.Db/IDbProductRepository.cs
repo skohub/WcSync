@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using WcSync.Db.Models;
+using WcSync.Model.Entities;
 
 namespace WcSync.Db
 {

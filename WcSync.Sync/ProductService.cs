@@ -2,14 +2,15 @@ using System;
 using System.Linq;
 using WcSync.Wc;
 using WcSync.Db;
-using WcSync.Db.Models;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
+using WcSync.Model;
+using WcSync.Model.Entities;
 
-namespace WcSync.Cli
+namespace WcSync.Sync
 {
     public class ProductService : IProductService
     {

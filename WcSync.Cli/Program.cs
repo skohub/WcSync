@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WcSync.Db;
+using WcSync.Model;
+using WcSync.Sync;
 using WcSync.Wc;
 
 namespace WcSync.Cli

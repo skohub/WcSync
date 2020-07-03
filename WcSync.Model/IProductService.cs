@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace WcSync.Cli
+namespace WcSync.Model
 {
     public interface IProductService
     {

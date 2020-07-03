@@ -2,12 +2,13 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using WcSync.Cli;
+using WcSync.Model;
 using WcSync.Wc;
 using WcSync.Db;
-using WcSync.Db.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using WcSync.Model.Entities;
+using WcSync.Sync;
 
 namespace WcSync.Tests
 {

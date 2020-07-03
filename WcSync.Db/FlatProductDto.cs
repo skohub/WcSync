@@ -1,4 +1,6 @@
-namespace WcSync.Db.Models
+using WcSync.Model.Entities;
+
+namespace WcSync.Db
 {
     public class FlatProductDto
     {
