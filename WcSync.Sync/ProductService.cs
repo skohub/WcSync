@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Net;
-using System.Threading;
 using WcSync.Model;
 using WcSync.Model.Entities;
 
@@ -14,9 +13,6 @@ namespace WcSync.Sync
 {
     public class ProductService : IProductService
     {
-        private const int RequestDelay = 3000;
-        private const int FailedRequestDelay = 60000;
-
         private readonly IWcProductService _wcProductService;
         private readonly IDbProductRepository _dbProductRepository;
         private readonly ILogger<ProductService> _logger;
@@ -43,7 +39,7 @@ namespace WcSync.Sync
 
                 foreach (var product in products)
                 {
-                    await Task.Delay(RequestDelay);
+                    await Task.Delay(Consts.RequestDelay);
                     await UpdateProduct(product);
                 }
             }
@@ -72,7 +68,7 @@ namespace WcSync.Sync
             catch (WebException e)
             {
                 _logger.LogError(e, $"Failed to {nameof(_wcProductService.UpdateStockStatus)} for {product.Name} - {product.Id}");
-                await Task.Delay(FailedRequestDelay);
+                await Task.Delay(Consts.FailedRequestDelay);
             }
             catch (Exception e)
             {
@@ -86,7 +82,7 @@ namespace WcSync.Sync
                 .Where(a => a.Type == StoreType.Shop || a.Type == StoreType.Warehouse)
                 .Any(a => a.Quantity > 0);
 
-            return available ? "instock" : "onbackorder";
+            return available ? Consts.AvailableStatus : Consts.UnavailableStatus;
         }
 
         private IList<string> GetProductAvailability(Product product)

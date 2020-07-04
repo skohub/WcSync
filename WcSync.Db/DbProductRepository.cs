@@ -29,13 +29,13 @@ namespace WcSync.Db
                     sql: "call recently_updated_items(?)",
                     param: new { days_offset = 1 })
                 .GroupBy(
-                    fp => fp.ProductId, 
-                    fp => fp,
-                    (id, products) => new Product
+                    flatProduct => flatProduct.ProductId, 
+                    flatProduct => flatProduct,
+                    (id, flatProducts) => new Product
                     {
                         Id = id,
-                        Name = products.First(p => p.ProductId == id).ProductName,
-                        Availability = products
+                        Name = flatProducts.First(p => p.ProductId == id).ProductName,
+                        Availability = flatProducts
                             .Select(p => new Store
                             {
                                 Name = p.StoreName,
