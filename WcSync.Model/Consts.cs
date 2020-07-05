@@ -7,6 +7,6 @@ namespace WcSync.Model
 
         public const string AvailableStatus = "instock";
 
-        public const string UnavailableStatus = "onbackorder";
+        public const string UnavailableStatus = "outofstock";
     } 
 }

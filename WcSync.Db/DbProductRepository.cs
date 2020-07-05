@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
-using WcSync.Model;
 using WcSync.Model.Entities;
 using Microsoft.Extensions.Configuration;
 using Dapper;
@@ -21,7 +20,7 @@ namespace WcSync.Db
             _configuration = configuration;
         }
 
-        public List<Product> GetAvailableProducts()
+        public List<DbProduct> GetRecentlyUpdatedProducts()
         {
             // get a flat list of products and group by productid
             return Connection
@@ -31,7 +30,7 @@ namespace WcSync.Db
                 .GroupBy(
                     flatProduct => flatProduct.ProductId, 
                     flatProduct => flatProduct,
-                    (id, flatProducts) => new Product
+                    (id, flatProducts) => new DbProduct
                     {
                         Id = id,
                         Name = flatProducts.First(p => p.ProductId == id).ProductName,
@@ -40,6 +39,31 @@ namespace WcSync.Db
                             {
                                 Name = p.StoreName,
                                 Quantity = p.Quantity,
+                                Type = p.StoreType,
+                            })
+                            .ToList(),
+                    })
+                .ToList();
+        }
+
+        public List<DbProduct> GetProducts()
+        {
+            // get a flat list of products and group by productid
+            return Connection
+                .Query<ItemRestDto>(sql: "call items_rest(0)")
+                .Where(p => p.StoreType == StoreType.Shop || p.StoreType == StoreType.Warehouse)
+                .GroupBy(
+                    product => product.ItemID, 
+                    product => product,
+                    (id, products) => new DbProduct
+                    {
+                        Id = id,
+                        Name = products.First(p => p.ItemID == id).i_n,
+                        Availability = products
+                            .Select(p => new Store
+                            {
+                                Name = p.name,
+                                Quantity = p.summ,
                                 Type = p.StoreType,
                             })
                             .ToList(),

@@ -17,7 +17,6 @@ namespace WcSync.Wc
     public class WcProductService : IWcProductService
     {
         private const string _metaKey = "product_availability";
-        private const char _separator = ',';
         private const string _productsPerPage = "100";
 
         private readonly IConfiguration _configuration;
@@ -33,7 +32,7 @@ namespace WcSync.Wc
             _logger = logger;
         }
 
-        public async Task UpdateStockStatus(string sku, string stockStatus, IList<string> availability)
+        public async Task UpdateStockStatus(string sku, string stockStatus, string availability)
         {
             var product = await GetProductBySku(sku);
 
@@ -46,15 +45,28 @@ namespace WcSync.Wc
                     new ProductMeta 
                     {
                         key = _metaKey,
-                        value = string.Join(_separator.ToString(), availability),
+                        value = availability,
                     }
                 }
             });
-
-            return;
         }
 
-        public async Task<List<Model.Entities.Product>> GetProductsAsync()
+        public async Task UpdateStockStatus(int productId, string stockStatus, string availability)
+        {
+            await WcClient.Product.Update(productId, new Product { 
+                stock_status = stockStatus,
+                meta_data = new List<ProductMeta>
+                {
+                    new ProductMeta 
+                    {
+                        key = _metaKey,
+                        value = availability,
+                    }
+                }
+            });
+        }
+
+        public async Task<List<WcProduct>> GetProductsAsync()
         {
             var products = new List<Product>();
             var page = 1;
@@ -84,22 +96,18 @@ namespace WcSync.Wc
                 await Task.Delay(Consts.RequestDelay);
             }
 
-            return products.Select(product => new Model.Entities.Product
-            {
-                Id = int.TryParse(product.sku, out int id) ? id : -1,
-                Name = product.name,
-                Availability = product.meta_data
-                    .Where(meta => meta.key == _metaKey)
-                    .SelectMany(meta => ((string) meta.value).Split(_separator))
-                    .Select(storeName => new Store
-                    {
-                        Name = storeName,
-                        Quantity = product.stock_status == Consts.AvailableStatus ? 1 : 0,
-                        Type = StoreType.Shop,
-                    })
-                    .ToList()
-            })
-            .ToList();
+            return products
+                .Where(p => p.id != null)
+                .Where(p => int.TryParse(p.sku, out _))
+                .Select(product => new WcProduct
+                {
+                    Id = product.id.Value,
+                    Sku = product.sku,
+                    Name = product.name,
+                    Availability = (string) product.meta_data.FirstOrDefault(meta => meta.key == _metaKey)?.value,
+                    StockStatus = product.stock_status,
+                })
+                .ToList();
         }
 
         private async Task<Product> GetProductBySku(string sku)
@@ -114,7 +122,7 @@ namespace WcSync.Wc
 
         private void ResponseFilter(HttpWebResponse response)
         {
-            _totalPages = int.Parse(response.Headers["X-WP-TotalPages"]);
+            int.TryParse(response.Headers["X-WP-TotalPages"], out _totalPages);
         }
 
         private WCObject Connect() 

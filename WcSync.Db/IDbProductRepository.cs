@@ -5,6 +5,8 @@ namespace WcSync.Db
 {
     public interface IDbProductRepository
     {
-        List<Product> GetAvailableProducts();
+        List<DbProduct> GetRecentlyUpdatedProducts();
+
+        List<DbProduct> GetProducts();
     }
 }

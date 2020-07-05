@@ -24,9 +24,9 @@ namespace WcSync.Tests
             _wcProductServiceMock = new Mock<IWcProductService>();
             _dbProductRepositoryMock = new Mock<IDbProductRepository>();
             _dbProductRepositoryMock
-                .Setup(r => r.GetAvailableProducts())
-                .Returns(new List<Product> {
-                    new Product
+                .Setup(r => r.GetRecentlyUpdatedProducts())
+                .Returns(new List<DbProduct> {
+                    new DbProduct
                     {
                         Id = 0,
                         Availability = new List<Store>
