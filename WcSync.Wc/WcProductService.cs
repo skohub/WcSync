@@ -32,7 +32,7 @@ namespace WcSync.Wc
             _logger = logger;
         }
 
-        public async Task UpdateStockStatus(string sku, string stockStatus, string availability)
+        public async Task UpdateProduct(string sku, string stockStatus, string availability)
         {
             var product = await GetProductBySku(sku);
 
@@ -51,7 +51,7 @@ namespace WcSync.Wc
             });
         }
 
-        public async Task UpdateStockStatus(int productId, string stockStatus, string availability)
+        public async Task UpdateProduct(int productId, string stockStatus, string availability)
         {
             await WcClient.Product.Update(productId, new Product { 
                 stock_status = stockStatus,

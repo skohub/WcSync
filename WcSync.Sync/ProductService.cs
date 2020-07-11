@@ -96,7 +96,7 @@ namespace WcSync.Sync
 
                 if (wcProduct.StockStatus != stockStatus || wcProduct.Availability != availability) 
                 {
-                    await _wcProductService.UpdateStockStatus(wcProduct.Id, stockStatus, availability);
+                    await _wcProductService.UpdateProduct(wcProduct.Id, stockStatus, availability);
 
                     _logger.LogInformation(
                         $"Product {wcProduct.Name} - {wcProduct.Sku} was successfully updated to \"{stockStatus}\", " +
@@ -107,12 +107,12 @@ namespace WcSync.Sync
             } 
             catch (WebException e)
             {
-                _logger.LogError(e, $"Failed to {nameof(_wcProductService.UpdateStockStatus)} for {wcProduct.Name} - {wcProduct.Sku}");
+                _logger.LogError(e, $"Failed to {nameof(_wcProductService.UpdateProduct)} for {wcProduct.Name} - {wcProduct.Sku}");
                 await Task.Delay(Consts.FailedRequestDelay);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed to {nameof(_wcProductService.UpdateStockStatus)} for {wcProduct.Name} - {wcProduct.Sku}");
+                _logger.LogError(e, $"Failed to {nameof(_wcProductService.UpdateProduct)} for {wcProduct.Name} - {wcProduct.Sku}");
             }
         }
 
@@ -124,7 +124,7 @@ namespace WcSync.Sync
             {
                 var stockStatus = product.GetStockStatus();
                 var availability = product.GetAvailability();
-                await _wcProductService.UpdateStockStatus(product.Id.ToString(), stockStatus, availability);
+                await _wcProductService.UpdateProduct(product.Id.ToString(), stockStatus, availability);
 
                 _logger.LogInformation(
                     $"Product {product.Name} - {product.Id} was successfully updated to \"{stockStatus}\", " +
@@ -132,12 +132,12 @@ namespace WcSync.Sync
             } 
             catch (WebException e)
             {
-                _logger.LogError(e, $"Failed to {nameof(_wcProductService.UpdateStockStatus)} for {product.Name} - {product.Id}");
+                _logger.LogError(e, $"Failed to {nameof(_wcProductService.UpdateProduct)} for {product.Name} - {product.Id}");
                 await Task.Delay(Consts.FailedRequestDelay);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed to {nameof(_wcProductService.UpdateStockStatus)} for {product.Name} - {product.Id}");
+                _logger.LogError(e, $"Failed to {nameof(_wcProductService.UpdateProduct)} for {product.Name} - {product.Id}");
             }
         }
     }
