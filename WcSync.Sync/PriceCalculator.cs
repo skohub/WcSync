@@ -31,8 +31,8 @@ namespace WcSync.Sync
             }
             else
             {
-                var prices = product.Availability.Select(a => $"{a.Name: a.Price}");
-                _logger.LogInformation($"Prices are not equal in stores. {string.Join(", ", prices)}");
+                var prices = product.Availability.Select(a => $"{a.Name}: {a.Price}");
+                _logger.LogInformation($"Prices are not equal in stores for {product.Name} - {product.Id}. {string.Join(", ", prices)}");
 
                 return null;
             }

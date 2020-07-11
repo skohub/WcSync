@@ -77,7 +77,7 @@ namespace WcSync.Wc
             // Keep requests single threaded to prevent WooCommerce server overload
             while (page <= _totalPages)
             {
-                _logger.LogInformation($"Retrieveing products, page {page}/{_totalPages}");
+                _logger.LogInformation($"Retrieveing products, page {page}/{(_totalPages == 1 ? "?" : _totalPages.ToString())}");
 
                 try
                 {

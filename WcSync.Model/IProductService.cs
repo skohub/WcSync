@@ -7,5 +7,7 @@ namespace WcSync.Model
         Task UpdateRecentProductsAsync();
 
         Task UpdateAllProductsAsync();
+
+        Task ListPriceDicrepancies();
     }
 }

@@ -77,6 +77,32 @@ namespace WcSync.Sync
             _logger.LogDebug($"End {nameof(UpdateAllProductsAsync)}");
         }
 
+        public async Task ListPriceDicrepancies()
+        {
+            var dbProducts = _dbProductRepository.GetProducts();
+            var wcProducts = await _wcProductService.GetProductsAsync();
+
+            foreach (var wcProduct in wcProducts)
+            {
+                var dbProduct = dbProducts.FirstOrDefault(p => int.TryParse(wcProduct.Sku, out int id) && p.Id == id);
+                if (dbProduct == null) 
+                {
+                    continue;
+                }
+
+                var price = _priceCalculator.GetPrice(dbProduct);
+                if (price == null) 
+                {
+                    continue;
+                }
+
+                if (wcProduct.Price != price)
+                {
+                    _logger.LogInformation($"{wcProduct.Name} - {wcProduct.Sku}. Site/database: {wcProduct.Price} / {price}");
+                }
+            }
+        }
+
         private async Task UpdateProductIfNecessary(WcProduct wcProduct, DbProduct dbProduct) 
         {
             if (wcProduct == null) 
