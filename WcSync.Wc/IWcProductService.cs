@@ -8,7 +8,7 @@ namespace WcSync.Wc
     {
         Task UpdateProduct(string sku, string stockStatus, string availability);
 
-        Task UpdateProduct(int productId, string stockStatus, string availability);
+        Task UpdateProduct(int productId, string stockStatus, string availability, decimal? price);
 
         Task<List<WcProduct>> GetProductsAsync();
     }

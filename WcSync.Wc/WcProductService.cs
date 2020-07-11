@@ -51,10 +51,12 @@ namespace WcSync.Wc
             });
         }
 
-        public async Task UpdateProduct(int productId, string stockStatus, string availability)
+        public async Task UpdateProduct(int productId, string stockStatus, string availability, decimal? price)
         {
             await WcClient.Product.Update(productId, new Product { 
                 stock_status = stockStatus,
+                price = price,
+                regular_price = price,
                 meta_data = new List<ProductMeta>
                 {
                     new ProductMeta 
@@ -105,6 +107,7 @@ namespace WcSync.Wc
                     Sku = product.sku,
                     Name = product.name,
                     Availability = (string) product.meta_data.FirstOrDefault(meta => meta.key == _metaKey)?.value,
+                    Price = product.price,
                     StockStatus = product.stock_status,
                 })
                 .ToList();

@@ -28,7 +28,8 @@ namespace WcSync.Cli
                 .AddSingleton<IWcProductService, WcProductService>()
                 .AddSingleton<IDbProductRepository, DbProductRepository>()
                 .AddSingleton<IProductService, ProductService>()
-                .AddSingleton<IConfiguration>(configuration);
+                .AddSingleton<IConfiguration>(configuration)
+                .AddTransient<IPriceCalculator, PriceCalculator>();
 
             serviceCollection.AddLogging(configure => configure.AddConsole(c => c.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] "));
 

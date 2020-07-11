@@ -13,6 +13,8 @@ namespace WcSync.Model.Entities
 
         public string Availability { get; set; }
 
+        public decimal? Price { get; set; }
+
         public string StockStatus { get; set; }
     }
 }

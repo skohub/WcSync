@@ -64,6 +64,7 @@ namespace WcSync.Db
                             {
                                 Name = p.name,
                                 Quantity = p.summ,
+                                Price = p.price,
                                 Type = p.StoreType,
                             })
                             .ToList(),

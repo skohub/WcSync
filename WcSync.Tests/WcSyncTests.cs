@@ -48,6 +48,7 @@ namespace WcSync.Tests
             var productService = new ProductService(
                 _wcProductServiceMock.Object,
                 _dbProductRepositoryMock.Object,
+                new Mock<IPriceCalculator>().Object,
                 new Mock<ILogger<ProductService>>().Object);
 
             // Act

@@ -13,5 +13,7 @@ namespace WcSync.Db
         public StoreType StoreType { get; set; }
 
         public int summ { get; set; }    
+
+        public decimal price { get; set; }
     }
 }

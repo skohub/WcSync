@@ -14,15 +14,18 @@ namespace WcSync.Sync
     {
         private readonly IWcProductService _wcProductService;
         private readonly IDbProductRepository _dbProductRepository;
+        private readonly IPriceCalculator _priceCalculator;
         private readonly ILogger<ProductService> _logger;
 
         public ProductService(
             IWcProductService wcProductService, 
             IDbProductRepository dbProductRepository,
+            IPriceCalculator priceCalculator,
             ILogger<ProductService> logger)
         {
             _wcProductService = wcProductService;
             _dbProductRepository = dbProductRepository;
+            _priceCalculator = priceCalculator;
             _logger = logger;
         }
 
@@ -87,20 +90,24 @@ namespace WcSync.Sync
             {
                 string stockStatus = Consts.UnavailableStatus;
                 string availability = null;
+                decimal? price = null;
 
                 if (dbProduct != null) 
                 {
                     stockStatus = dbProduct.GetStockStatus();
                     availability = dbProduct.GetAvailability();
+                    price = _priceCalculator.GetPrice(dbProduct);
                 }
 
-                if (wcProduct.StockStatus != stockStatus || wcProduct.Availability != availability) 
+                bool priceUpdated = price != null && (wcProduct.Price != price);
+
+                if (wcProduct.StockStatus != stockStatus || wcProduct.Availability != availability || priceUpdated)
                 {
-                    await _wcProductService.UpdateProduct(wcProduct.Id, stockStatus, availability);
+                    await _wcProductService.UpdateProduct(wcProduct.Id, stockStatus, availability, price);
 
                     _logger.LogInformation(
                         $"Product {wcProduct.Name} - {wcProduct.Sku} was successfully updated to \"{stockStatus}\", " +
-                        $"available in \"{availability}\"");
+                        $"available in \"{availability}\", price: {price}");
 
                     await Task.Delay(Consts.RequestDelay);
                 }
