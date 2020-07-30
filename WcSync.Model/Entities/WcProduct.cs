@@ -16,5 +16,7 @@ namespace WcSync.Model.Entities
         public decimal? Price { get; set; }
 
         public string StockStatus { get; set; }
+
+        public bool FixedPrice { get; set; }
     }
 }

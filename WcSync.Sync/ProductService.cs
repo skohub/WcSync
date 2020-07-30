@@ -125,6 +125,13 @@ namespace WcSync.Sync
                     price = _priceCalculator.GetPrice(dbProduct);
                 }
 
+                if (wcProduct.FixedPrice)
+                {
+                    _logger.LogInformation($"Product {wcProduct.Name} - {wcProduct.Sku} has fixed price.");
+
+                    price = wcProduct.Price;
+                }
+
                 bool priceUpdated = price != null && (wcProduct.Price != price);
 
                 if (wcProduct.StockStatus != stockStatus || wcProduct.Availability != availability || priceUpdated)

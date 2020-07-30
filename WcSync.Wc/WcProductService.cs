@@ -16,7 +16,8 @@ namespace WcSync.Wc
 {
     public class WcProductService : IWcProductService
     {
-        private const string _metaKey = "product_availability";
+        private const string _availabilityMetaKey = "product_availability";
+        private const string _fixedPriceMetaKey = "fixed_price";
         private const string _productsPerPage = "100";
 
         private readonly IConfiguration _configuration;
@@ -44,7 +45,7 @@ namespace WcSync.Wc
                 {
                     new ProductMeta 
                     {
-                        key = _metaKey,
+                        key = _availabilityMetaKey,
                         value = availability,
                     }
                 }
@@ -61,7 +62,7 @@ namespace WcSync.Wc
                 {
                     new ProductMeta 
                     {
-                        key = _metaKey,
+                        key = _availabilityMetaKey,
                         value = availability,
                     }
                 }
@@ -106,11 +107,19 @@ namespace WcSync.Wc
                     Id = product.id.Value,
                     Sku = product.sku,
                     Name = product.name,
-                    Availability = (string) product.meta_data.FirstOrDefault(meta => meta.key == _metaKey)?.value,
+                    Availability = (string) product.meta_data.FirstOrDefault(meta => meta.key == _availabilityMetaKey)?.value,
                     Price = product.price,
                     StockStatus = product.stock_status,
+                    FixedPrice = GetFixedPriceProperty(product), 
                 })
                 .ToList();
+        }
+
+        private bool GetFixedPriceProperty(Product product)
+        {
+            var value = (string) product.meta_data.FirstOrDefault(meta => meta.key == _fixedPriceMetaKey)?.value;
+            
+            return bool.TryParse(value, out var result) ? result : false;
         }
 
         private async Task<Product> GetProductBySku(string sku)
