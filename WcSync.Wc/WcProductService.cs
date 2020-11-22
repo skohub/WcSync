@@ -33,25 +33,6 @@ namespace WcSync.Wc
             _logger = logger;
         }
 
-        public async Task UpdateProduct(string sku, string stockStatus, string availability)
-        {
-            var product = await GetProductBySku(sku);
-
-            var productId = product?.id ?? throw new Exception($"Product {sku} was not found in woocommerce");
-
-            await WcClient.Product.Update(productId, new Product { 
-                stock_status = stockStatus,
-                meta_data = new List<ProductMeta>
-                {
-                    new ProductMeta 
-                    {
-                        key = _availabilityMetaKey,
-                        value = availability,
-                    }
-                }
-            });
-        }
-
         public async Task UpdateProduct(int productId, string stockStatus, string availability, decimal? regularPrice, decimal? salePrice)
         {
             await WcClient.Product.Update(productId, new Product { 
