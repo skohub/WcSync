@@ -4,6 +4,6 @@ namespace WcSync.Sync
 {
     public interface IPriceCalculator
     {
-        decimal? GetPrice(DbProduct product);
+        (decimal? price, decimal? salePrice) GetPrice(DbProduct product);
     }
 }

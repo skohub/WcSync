@@ -52,12 +52,12 @@ namespace WcSync.Wc
             });
         }
 
-        public async Task UpdateProduct(int productId, string stockStatus, string availability, decimal? price)
+        public async Task UpdateProduct(int productId, string stockStatus, string availability, decimal? regularPrice, decimal? salePrice)
         {
             await WcClient.Product.Update(productId, new Product { 
                 stock_status = stockStatus,
-                price = price,
-                regular_price = price,
+                regular_price = regularPrice,
+                sale_price = salePrice,
                 meta_data = new List<ProductMeta>
                 {
                     new ProductMeta 
@@ -108,7 +108,8 @@ namespace WcSync.Wc
                     Sku = product.sku,
                     Name = product.name,
                     Availability = (string) product.meta_data.FirstOrDefault(meta => meta.key == _availabilityMetaKey)?.value,
-                    Price = product.price,
+                    RegularPrice = product.regular_price,
+                    SalePrice = product.sale_price,
                     StockStatus = product.stock_status,
                     FixedPrice = GetFixedPriceProperty(product), 
                 })

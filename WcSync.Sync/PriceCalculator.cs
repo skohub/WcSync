@@ -10,36 +10,53 @@ namespace WcSync.Sync
 
         private const decimal _discount = 0.97m;
 
+        private const decimal _discuontLowerBoundary = 3000m;
+
         public PriceCalculator(ILogger<ProductService> logger)
         {
             _logger = logger;
         }
 
-        public decimal? GetPrice(DbProduct product)
+        public (decimal? price, decimal? salePrice) GetPrice(DbProduct product)
         {
-            if (product.Availability?.Any() != true)
+            if (product?.Availability?.Any() != true)
             {
-                return null;
+                return (null, null);
             }
 
-            decimal price = product.Availability.First().Price;
+            var availability = product.Availability
+                .Where(a => a.Type == StoreType.Shop || a.Type == StoreType.Warehouse)
+                .Where(a => a.Quantity > 0)
+                .Where(a => a.Price > 0)
+                .ToList();
 
-
-            if (product.Availability.All(s => s.Price == price)) 
+            if (availability.Any() != true)
             {
-                return ApplyDiscount(price);
+                return (null, null);
+            }
+
+            var price = availability.First().Price;
+
+            if (availability.All(s => s.Price == price)) 
+            {
+                return (price, ApplyDiscount(price));
             }
             else
             {
-                var prices = product.Availability.Select(a => $"{a.Name}: {a.Price}");
+                var prices = availability.Select(a => $"{a.Name}: {a.Price}");
                 _logger.LogInformation($"Prices are not equal in stores for {product.Name} - {product.Id}. {string.Join(", ", prices)}");
 
-                return null;
+                return (null, null);
             }
         }
 
         private decimal ApplyDiscount(decimal price)
         {
+            if (price <= _discuontLowerBoundary)
+            {
+                return price;
+            }
+
             return decimal.Round((price * _discount) / 10) * 10;
         }
     }
