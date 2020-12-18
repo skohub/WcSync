@@ -19,10 +19,7 @@ namespace WcSync.Sync
 
         public (decimal? price, decimal? salePrice) GetPrice(DbProduct product)
         {
-            if (product?.Availability?.Any() != true)
-            {
-                return (null, null);
-            }
+            if (product?.Availability?.Any() != true) return (null, null);
 
             var availability = product.Availability
                 .Where(a => a.Type == StoreType.Shop || a.Type == StoreType.Warehouse)
@@ -30,24 +27,18 @@ namespace WcSync.Sync
                 .Where(a => a.Price > 0)
                 .ToList();
 
-            if (availability.Any() != true)
-            {
-                return (null, null);
-            }
+            if (availability.Any() != true) return (null, null);
 
-            var price = availability.First().Price;
+            var price = decimal.Round(availability.First().Price);
 
-            if (availability.All(s => s.Price == price)) 
+            if (availability.All(s => s.Price == price) == false)
             {
-                return (price, ApplyDiscount(price));
-            }
-            else
-            {
+                price = availability.Max(a => a.Price);
                 var prices = availability.Select(a => $"{a.Name}: {a.Price}");
                 _logger.LogInformation($"Prices are not equal in stores for {product.Name} - {product.Id}. {string.Join(", ", prices)}");
-
-                return (null, null);
             }
+
+            return (price, ApplyDiscount(price));
         }
 
         private decimal ApplyDiscount(decimal price)

@@ -143,8 +143,9 @@ namespace WcSync.Sync
                 }
 
                 _logger.LogInformation(
-                    $"Updating product {wcProduct.Name} - {wcProduct.Sku} to \"{stockStatus}\", " +
-                    $"available in \"{availability}\", price: {price}, salePrice: {salePrice}");
+                    $"Updating product {wcProduct.Name} - {wcProduct.Sku} from {wcProduct.StockStatus} - " +
+                    $"\"{wcProduct.Availability}\" price: {wcProduct.RegularPrice:F0}/{wcProduct.SalePrice:F0} to " +
+                    $"{stockStatus} - \"{availability}\", price: {price:F0}/{salePrice:F0}");
                 await _wcProductService.UpdateProduct(wcProduct.Id, stockStatus, availability, price, salePrice);
 
                 await Task.Delay(Consts.RequestDelay);
