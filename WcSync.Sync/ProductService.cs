@@ -162,7 +162,7 @@ namespace WcSync.Sync
 
         private async Task SetUnavailableStatus(WcProduct wcProduct)
         {
-            if (wcProduct.Availability != Consts.UnavailableStatus || !string.IsNullOrWhiteSpace(wcProduct.Availability))
+            if (wcProduct.StockStatus != Consts.UnavailableStatus || !string.IsNullOrWhiteSpace(wcProduct.Availability))
             {
                 _logger.LogInformation($"Updating product {wcProduct.Name} - {wcProduct.Sku} to \"{Consts.UnavailableStatus}\"");
                 await _wcProductService.UpdateProduct(wcProduct.Id, Consts.UnavailableStatus, string.Empty, null, null);
