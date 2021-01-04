@@ -72,7 +72,7 @@ namespace WcSync.Wc
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError("Failed to retrieve products page", e);
+                    _logger.LogError(e, "Failed to retrieve products page");
                     
                     await Task.Delay(Consts.FailedRequestDelay);
                 }
