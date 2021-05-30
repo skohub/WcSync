@@ -63,7 +63,7 @@ namespace WcSync.Sync
             _logger.LogDebug($"End {nameof(UpdateAllProductsAsync)}");
         }
 
-        public async Task ListPriceDicrepancies()
+        public async Task ListProductsDicrepancies()
         {
             var dbProducts = _dbProductRepository.GetProducts();
             var wcProducts = await _wcProductService.GetProductsAsync();

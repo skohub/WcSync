@@ -127,6 +127,7 @@ namespace WcSync.Wc
                 _configuration["WcSecret"],
                 responseFilter: ResponseFilter);
 
+                _logger.LogInformation($"WcHost: {_configuration["WcHost"]}/wp-json/wc/v3/");
             return new WCObject(rest);
         }
     }

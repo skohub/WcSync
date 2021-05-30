@@ -16,7 +16,20 @@ namespace WcSync.Cli
             var serviceProvider = ConfigureServices(new ServiceCollection()).BuildServiceProvider();
 
             var productService = serviceProvider.GetService<IProductService>();
-            await productService.UpdateAllProductsAsync();
+            
+            var command = args.Length == 1 ? args[0].ToLower() : "update";
+            switch (command) 
+            {
+                case "list":
+                    await productService.ListProductsDicrepancies();
+                    break;
+                case "update":
+                    await productService.UpdateAllProductsAsync();
+                    break;
+                default:
+                    await productService.UpdateAllProductsAsync();
+                    break;
+            }
         }
 
         private static IServiceCollection ConfigureServices(IServiceCollection serviceCollection) {

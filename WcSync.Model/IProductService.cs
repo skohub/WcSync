@@ -6,6 +6,6 @@ namespace WcSync.Model
     {
         Task UpdateAllProductsAsync();
 
-        Task ListPriceDicrepancies();
+        Task ListProductsDicrepancies();
     }
 }
