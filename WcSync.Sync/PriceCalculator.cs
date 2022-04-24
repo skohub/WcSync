@@ -38,7 +38,7 @@ namespace WcSync.Sync
                 _logger.LogInformation($"Prices are not equal in stores for {product.Name} - {product.Id}. {string.Join(", ", prices)}");
             }
 
-            return (price, ApplyDiscount(price));
+            return (price, price);
         }
 
         private decimal ApplyDiscount(decimal price)
