@@ -91,12 +91,7 @@ namespace WcSync.Tests
 
             // Assert
             _wcProductServiceMock.Verify(
-                s => s.UpdateProduct(
-                    It.IsAny<int>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<decimal?>(),
-                    It.IsAny<decimal?>()),
+                s => s.UpdateProductsAsync(It.IsAny<List<WcProduct>>()),
                 Times.Never);
         }
 
@@ -115,12 +110,7 @@ namespace WcSync.Tests
 
             // Assert
             _wcProductServiceMock.Verify(
-                s => s.UpdateProduct(
-                    DefaultDbProduct.Id,
-                    DefaultDbProduct.GetStockStatus(),
-                    DefaultDbProduct.GetAvailability(),
-                    10000,
-                    9700),
+                s => s.UpdateProductsAsync(It.IsAny<List<WcProduct>>()),
                 Times.Once);
         }
     }

@@ -18,7 +18,6 @@ namespace WcSync.Wc
     {
         private const string _availabilityMetaKey = "product_availability";
         private const string _fixedPriceMetaKey = "fixed_price";
-        private const string _productsPerPage = "100";
 
         private readonly IConfiguration _configuration;
         private readonly ILogger<WcProductService> _logger;
@@ -33,9 +32,10 @@ namespace WcSync.Wc
             _logger = logger;
         }
 
-        public async Task UpdateProduct(int productId, string stockStatus, string availability, decimal? regularPrice, decimal? salePrice)
+        public async Task UpdateProductAsync(int productId, string stockStatus, string availability, decimal? regularPrice, decimal? salePrice)
         {
-            await WcClient.Product.Update(productId, new Product { 
+            await WcClient.Product.Update(productId, new Product
+            {
                 stock_status = stockStatus,
                 regular_price = regularPrice,
                 sale_price = salePrice,
@@ -48,6 +48,32 @@ namespace WcSync.Wc
                     }
                 }
             });
+        }
+
+        public async Task UpdateProductsAsync(List<WcProduct> products)
+        {
+            var batch = new ProductBatch()
+            {
+                update = products
+                    .Select(x => new Product 
+                    {
+                        id = x.Id,
+                        stock_status = x.StockStatus,
+                        regular_price = x.RegularPrice,
+                        sale_price = x.SalePrice,
+                        meta_data = new List<ProductMeta>
+                        {
+                            new ProductMeta 
+                            {
+                                key = _availabilityMetaKey,
+                                value = x.Availability,
+                            }
+                        },
+                    })
+                    .ToList(),
+            };
+
+            await WcClient.Product.UpdateRange(batch);
         }
 
         public async Task<List<WcProduct>> GetProductsAsync()
@@ -66,7 +92,7 @@ namespace WcSync.Wc
                     products.AddRange(await WcClient.Product.GetAll(new Dictionary<string, string> 
                     { 
                         ["page"] = page.ToString(),
-                        ["per_page"] = _productsPerPage,
+                        ["per_page"] = Consts.BatchSize.ToString(),
                     }));
                     page += 1;
                 }
@@ -125,9 +151,11 @@ namespace WcSync.Wc
                 $"{_configuration["WcHost"]}/wp-json/wc/v3/", 
                 _configuration["WcClient"], 
                 _configuration["WcSecret"],
+                authorizedHeader: false,
                 responseFilter: ResponseFilter);
 
-                _logger.LogInformation($"WcHost: {_configuration["WcHost"]}/wp-json/wc/v3/");
+            _logger.LogInformation($"WcHost: {_configuration["WcHost"]}/wp-json/wc/v3/");
+
             return new WCObject(rest);
         }
     }

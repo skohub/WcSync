@@ -4,9 +4,9 @@ using WcSync.Wc;
 using WcSync.Db;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using System.Net;
 using WcSync.Model;
 using WcSync.Model.Entities;
+using System.Collections.Generic;
 
 namespace WcSync.Sync
 {
@@ -37,6 +37,7 @@ namespace WcSync.Sync
             {
                 var dbProducts = _dbProductRepository.GetProducts();
                 var wcProducts = await _wcProductService.GetProductsAsync();
+                var updatedWcProducts = new List<WcProduct>();
 
                 foreach (var wcProduct in wcProducts)
                 {
@@ -44,15 +45,21 @@ namespace WcSync.Sync
 
                     if (dbProduct == null) 
                     {
-                        await SetUnavailableStatus(wcProduct);
+                        _logger.LogInformation($"Updating product {wcProduct.Name} - {wcProduct.Sku} to \"{Consts.UnavailableStatus}\"");
+                        updatedWcProducts.Add(SetUnavailableStatus(wcProduct));
 
                         continue;
                     }
 
                     if (ProductEquals(wcProduct, dbProduct) == false)
                     {
-                        await UpdateProduct(wcProduct, dbProduct);
+                        updatedWcProducts.Add(UpdateProduct(wcProduct, dbProduct));
                     }
+                }
+
+                if (updatedWcProducts.Any())
+                {
+                    await UpdateProductsBatchAsync(updatedWcProducts);
                 }
             }
             catch (Exception e)
@@ -71,16 +78,10 @@ namespace WcSync.Sync
             foreach (var wcProduct in wcProducts.Where(p => p.Availability?.Any() == true))
             {
                 var dbProduct = dbProducts.FirstOrDefault(p => int.TryParse(wcProduct.Sku, out int id) && p.Id == id);
-                if (dbProduct == null) 
-                {
-                    continue;
-                }
+                if (dbProduct == null) continue;
 
-                (var price, var salePrice) = _priceCalculator.GetPrice(dbProduct);
-                if (price == null) 
-                {
-                    continue;
-                }
+                var (price, salePrice) = _priceCalculator.GetPrice(dbProduct);
+                if (price == null) continue;
 
                 if (wcProduct.SalePrice != salePrice)
                 {
@@ -95,6 +96,20 @@ namespace WcSync.Sync
             var notFoundProductsStr = string.Join("\r\n", notFoundProducts.Select(product => $"{product.Name} - {product.Id}"));
 
             notFoundProducts.ForEach(product => _logger.LogInformation($"Not found product: {product.Name} - {product.Id}"));
+        }
+
+        private async Task UpdateProductsBatchAsync(List<WcProduct> wcProducts)
+        {
+            var position = 0;
+            do 
+            {
+                var batch = wcProducts.Skip(position).Take(Consts.BatchSize).ToList();
+                _logger.LogInformation($"Updating products {position}-{position + batch.Count}");
+                await _wcProductService.UpdateProductsAsync(batch);
+                position += batch.Count;
+                await Task.Delay(Consts.RequestDelay);
+            }
+            while (position < wcProducts.Count);
         }
 
         private bool ProductEquals(WcProduct wcProduct, DbProduct dbProduct)
@@ -123,53 +138,43 @@ namespace WcSync.Sync
                 (wcProduct.SalePrice ?? price) == salePrice;
         }
 
-        private async Task UpdateProduct(WcProduct wcProduct, DbProduct dbProduct) 
+        private WcProduct UpdateProduct(WcProduct wcProduct, DbProduct dbProduct) 
         {
-            if (wcProduct == null) 
+            var stockStatus = dbProduct.GetStockStatus();
+            var availability = dbProduct.GetAvailability();
+            (var price, var salePrice) = _priceCalculator.GetPrice(dbProduct);
+
+            if (wcProduct.FixedPrice)
             {
-                _logger.LogError($"{nameof(wcProduct)} should not be null");
+                price = wcProduct.RegularPrice;
+                salePrice = wcProduct.SalePrice;
             }
 
-            try
-            {
-                var stockStatus = dbProduct.GetStockStatus();
-                var availability = dbProduct.GetAvailability();
-                (var price, var salePrice) = _priceCalculator.GetPrice(dbProduct);
+            _logger.LogInformation(
+                $"Updating product {wcProduct.Name} - {wcProduct.Sku} from {wcProduct.StockStatus} - " +
+                $"\"{wcProduct.Availability}\" price: {wcProduct.RegularPrice:F0}/{wcProduct.SalePrice:F0} to " +
+                $"{stockStatus} - \"{availability}\", price: {price:F0}/{salePrice:F0}");
 
-                if (wcProduct.FixedPrice)
-                {
-                    price = wcProduct.RegularPrice;
-                    salePrice = wcProduct.SalePrice;
-                }
-
-                _logger.LogInformation(
-                    $"Updating product {wcProduct.Name} - {wcProduct.Sku} from {wcProduct.StockStatus} - " +
-                    $"\"{wcProduct.Availability}\" price: {wcProduct.RegularPrice:F0}/{wcProduct.SalePrice:F0} to " +
-                    $"{stockStatus} - \"{availability}\", price: {price:F0}/{salePrice:F0}");
-                await _wcProductService.UpdateProduct(wcProduct.Id, stockStatus, availability, price, salePrice);
-
-                await Task.Delay(Consts.RequestDelay);
-            } 
-            catch (WebException e)
+            return new WcProduct
             {
-                _logger.LogError(e, $"Failed to {nameof(_wcProductService.UpdateProduct)} for {wcProduct.Name} - {wcProduct.Sku}");
-                await Task.Delay(Consts.FailedRequestDelay);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Failed to {nameof(_wcProductService.UpdateProduct)} for {wcProduct.Name} - {wcProduct.Sku}");
-            }
+                Id = wcProduct.Id,
+                StockStatus = stockStatus,
+                Availability = availability,
+                RegularPrice = price,
+                SalePrice = salePrice,
+            }; 
         }
 
-        private async Task SetUnavailableStatus(WcProduct wcProduct)
+        private WcProduct SetUnavailableStatus(WcProduct wcProduct)
         {
-            if (wcProduct.StockStatus != Consts.UnavailableStatus || !string.IsNullOrWhiteSpace(wcProduct.Availability))
+            return new WcProduct
             {
-                _logger.LogInformation($"Updating product {wcProduct.Name} - {wcProduct.Sku} to \"{Consts.UnavailableStatus}\"");
-                await _wcProductService.UpdateProduct(wcProduct.Id, Consts.UnavailableStatus, string.Empty, null, null);
-
-                await Task.Delay(Consts.RequestDelay);
-            }
+                Id = wcProduct.Id,
+                StockStatus = Consts.UnavailableStatus,
+                Availability = string.Empty,
+                RegularPrice = null,
+                SalePrice = null,
+            };
         }
     }
 }
