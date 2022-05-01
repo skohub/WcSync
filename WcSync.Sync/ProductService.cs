@@ -45,8 +45,11 @@ namespace WcSync.Sync
 
                     if (dbProduct == null) 
                     {
-                        _logger.LogInformation($"Updating product {wcProduct.Name} - {wcProduct.Sku} to \"{Consts.UnavailableStatus}\"");
-                        updatedWcProducts.Add(SetUnavailableStatus(wcProduct));
+                        if (wcProduct.StockStatus != Consts.UnavailableStatus)
+                        {
+                            _logger.LogInformation($"Updating product {wcProduct.Name} - {wcProduct.Sku} to \"{Consts.UnavailableStatus}\"");
+                            updatedWcProducts.Add(SetUnavailableStatus(wcProduct));
+                        }
 
                         continue;
                     }
